@@ -7,7 +7,7 @@ const CTX = canvas.getContext('2d');
 CANVAS.width = 1024;
 CANVAS.height = 576;
 const SCALE_SIZE = 4;
-const SCALED_CANVAS = {
+export const SCALED_CANVAS = {
     width: CANVAS.width / SCALE_SIZE,
     height: CANVAS.height / SCALE_SIZE,
 };
@@ -113,13 +113,20 @@ const PLAYER = new Player({
     }
 });
 
+export const CAMERA = {
+    position: {
+        x: 0,
+        y: 0
+    }
+}
+
 
 const animate = () => {
     requestAnimationFrame(animate);
     CTX.clearRect(0,0,CANVAS.width, CANVAS.height);
     CTX.save();
     CTX.scale(SCALE_SIZE, SCALE_SIZE);
-    CTX.translate(0, -BACKGROUND.image.height + SCALED_CANVAS.height)
+    CTX.translate(CAMERA.position.x, -BACKGROUND.image.height + SCALED_CANVAS.height)
     BACKGROUND.update();
     COLLISION_BLOCKS.forEach(block => {
         block.update();
@@ -127,17 +134,20 @@ const animate = () => {
     PLATFORM_COLLISION_BLOCKS.forEach(block => {
         block.update();
     })
+    PLAYER.checkForHorizontalCanvasCollision();
     PLAYER.update();
     PLAYER.setXVelocity(0);
     if (KEYS.d.pressed) {
         PLAYER.switchSprite('Run')
         PLAYER.setXVelocity(PLAYER_PHYSIC.moveSpeed)
         PLAYER.setDirection('right')
+        PLAYER.shouldPanCameraToTheLeft({ canvas: SCALED_CANVAS, camera: CAMERA})
     }
     else if (KEYS.a.pressed) {
         PLAYER.switchSprite('RunLeft')
         PLAYER.setXVelocity(-PLAYER_PHYSIC.moveSpeed)
         PLAYER.setDirection('left')
+        PLAYER.shouldPanCameraToTheRight({ camera: CAMERA})
     }
     else if (PLAYER.velocity.x === 0 && PLAYER.velocity.y === 0) {
         if (PLAYER.lastDirection === 'right')

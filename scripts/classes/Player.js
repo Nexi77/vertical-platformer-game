@@ -1,3 +1,4 @@
+import { CTX } from '../index.js'
 import { collision, platformCollision } from "../utils.js";
 import Sprite from "./Sprite.js";
 
@@ -23,11 +24,18 @@ export class Player extends Sprite {
         }
         this.animations = animations
         this.lastDirection = 'right'
-
         for (let key in this.animations) {
             const image = new Image()
             image.src = this.animations[key].imageSrc
             this.animations[key].image = image
+        }
+        this.camerabox = {
+            position: {
+                x: this.position.x,
+                y: this.position.y
+            },
+            width: 200,
+            height: 80
         }
     }
     
@@ -41,6 +49,32 @@ export class Player extends Sprite {
 
     setDirection(direction) {
         this.lastDirection = direction
+    }
+
+    updateCamerabox() {
+        this.camerabox = {
+            position: {
+                x: this.position.x - 58,
+                y: this.position.y
+            },
+            width: 200,
+            height: 80
+        }
+    }
+
+    shouldPanCameraToTheLeft({ canvas, camera }) {
+        const cameraboxRightSide = this.camerabox.position.x + this.camerabox.width
+        if (cameraboxRightSide >= 576) return
+        if (cameraboxRightSide >= canvas.width + Math.abs(camera.position.x)) {
+           camera.position.x -= this.velocity.x
+        }
+    }
+
+    shouldPanCameraToTheRight({ camera }) {
+        if (this.camerabox.position.x <= 0) return
+        if (this.camerabox.position.x <= Math.abs(camera.position.x)) {
+            camera.position.x -= this.velocity.x
+        }
     }
 
     updateHitbox(){
@@ -63,14 +97,16 @@ export class Player extends Sprite {
     }
 
     update(){
-        this.updateFrames();
-        this.draw();
-        this.position.x += this.velocity.x;
-        this.updateHitbox();
+        this.updateFrames()
+        this.updateHitbox()
+        this.updateCamerabox()
+        this.draw()
+        this.position.x += this.velocity.x
+        this.updateHitbox()
         this.checkForHorizontalCollisions()
-        this.applyGravity();
-        this.updateHitbox();
-        this.checkForVerticalCollisions();
+        this.applyGravity()
+        this.updateHitbox()
+        this.checkForVerticalCollisions()
     }
 
     applyGravity(){
@@ -128,6 +164,15 @@ export class Player extends Sprite {
                     break;
                 }
             }
+        }
+    }
+
+    checkForHorizontalCanvasCollision() {
+        if (
+            this.hitbox.position.x + this.hitbox.width + this.velocity.x >= 576 ||
+            this.hitbox.position.x + this.velocity.x - 2 <= 0
+        ) {
+            this.velocity.x = 0
         }
     }
 }

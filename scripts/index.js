@@ -20,7 +20,7 @@ const KEYS = {
 
 const PLAYER_PHYSIC = {
     moveSpeed: 2,
-    jumpHeight: 8
+    jumpHeight: 4
 }
 
 const BACKGROUND = new Sprite({ position: { x: 0, y: 0 }, imageSrc: '../assets/images/background/background.png'})
@@ -35,8 +35,10 @@ FLOOR_COLLISIONS_2D.forEach((row, rowIndex) => {
     row.forEach((symbol, symbolIndex) => {
         if(symbol === 202) {
             COLLISION_BLOCKS.push(new CollisionBlock({
-                x: symbolIndex * BLOCK_SIZE,
-                y: rowIndex * BLOCK_SIZE
+                position: {
+                    x: symbolIndex * BLOCK_SIZE,
+                    y: rowIndex * BLOCK_SIZE
+                }
             }))
         }
     });
@@ -51,8 +53,11 @@ PLATFORM_COLLISIONS_2D.forEach((row, rowIndex) => {
     row.forEach((symbol, symbolIndex) => {
         if(symbol === 202) {
             PLATFORM_COLLISION_BLOCKS.push(new CollisionBlock({
-                x: symbolIndex * BLOCK_SIZE,
-                y: rowIndex * BLOCK_SIZE
+                position: {
+                    x: symbolIndex * BLOCK_SIZE,
+                    y: rowIndex * BLOCK_SIZE
+                },
+                height: 5
             }))
         }
     });
@@ -61,6 +66,7 @@ PLATFORM_COLLISIONS_2D.forEach((row, rowIndex) => {
 const PLAYER = new Player({
     position: { x: 100, y: 350 },
     collisionBlocks: COLLISION_BLOCKS,
+    platformCollisionBlocks: PLATFORM_COLLISION_BLOCKS,
     imageSrc: '../assets/images/character/warrior/Idle.png',
     frameRate: 8,
     animations: {
@@ -163,7 +169,8 @@ window.addEventListener('keydown', (e) => {
             KEYS.a.pressed = true;
             break;
         case 'w':
-            PLAYER.setYVelocity(-PLAYER_PHYSIC.jumpHeight);
+            if (PLAYER.velocity.y === 0)
+                PLAYER.setYVelocity(-PLAYER_PHYSIC.jumpHeight);
             break;
     }
 })

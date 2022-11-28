@@ -77,6 +77,20 @@ export class Player extends Sprite {
         }
     }
 
+    shouldPanCameraDown({ camera }) {
+        if (this.camerabox.position.y + this.velocity.y <= 0) return
+        if (this.camerabox.position.y <= Math.abs(camera.position.y)) {
+            camera.position.y -= this.velocity.y
+        }
+    }
+
+    shouldPanCameraUp({ canvas, camera }) {
+        if (this.camerabox.position.y + this.camerabox.height + this.velocity.y >= 432) return
+        if (this.camerabox.position.y +  this.camerabox.height >= Math.abs(camera.position.y) + canvas.height) {
+            camera.position.y -= this.velocity.y
+        }
+    }
+
     updateHitbox(){
         this.hitbox = {
             position: {

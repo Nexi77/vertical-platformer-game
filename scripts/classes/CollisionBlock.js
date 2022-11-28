@@ -6,14 +6,6 @@ class CollisionBlock {
         this.width = 16;
         this.height = height;
     }
-    draw(){
-        CTX.fillStyle = 'rgba(255,0,0,0.5)';
-        CTX.fillRect(this.position.x, this.position.y, this.width, this.height);
-    }
-
-    update(){
-        this.draw();
-    }
 }
 
 export default CollisionBlock;

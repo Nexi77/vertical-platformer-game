@@ -113,10 +113,12 @@ const PLAYER = new Player({
     }
 });
 
+const BACKGROUND_IMAGE_HEIGHT = 432;
+
 export const CAMERA = {
     position: {
         x: 0,
-        y: 0
+        y: -BACKGROUND_IMAGE_HEIGHT + SCALED_CANVAS.height,
     }
 }
 
@@ -126,14 +128,8 @@ const animate = () => {
     CTX.clearRect(0,0,CANVAS.width, CANVAS.height);
     CTX.save();
     CTX.scale(SCALE_SIZE, SCALE_SIZE);
-    CTX.translate(CAMERA.position.x, -BACKGROUND.image.height + SCALED_CANVAS.height)
+    CTX.translate(CAMERA.position.x, CAMERA.position.y)
     BACKGROUND.update();
-    COLLISION_BLOCKS.forEach(block => {
-        block.update();
-    })
-    PLATFORM_COLLISION_BLOCKS.forEach(block => {
-        block.update();
-    })
     PLAYER.checkForHorizontalCanvasCollision();
     PLAYER.update();
     PLAYER.setXVelocity(0);
@@ -155,11 +151,13 @@ const animate = () => {
         else PLAYER.switchSprite('IdleLeft')
     }
     if (PLAYER.velocity.y < 0) {
+        PLAYER.shouldPanCameraDown({ camera: CAMERA })
         if(PLAYER.lastDirection === 'right')
             PLAYER.switchSprite('Jump')
         else PLAYER.switchSprite('JumpLeft')
     }
     else if (PLAYER.velocity.y > 0) {
+        PLAYER.shouldPanCameraUp({ camera: CAMERA, canvas: SCALED_CANVAS})
         if(PLAYER.lastDirection === 'right')
             PLAYER.switchSprite('Fall')
         else PLAYER.switchSprite('FallLeft')
